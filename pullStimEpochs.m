@@ -31,6 +31,7 @@ function [data_epoched, epoch_indices] = pullStimEpochs(data, burst_limits, fsDa
     dataStarts = round(fsRat*burst_limits(:, 1));
     
     %% Adjust for lag between stimulation onset signal and stimulation artifact
+    % UNTESTED
     
     if ~exist('adjust', 'var')
         adjust = false;
@@ -41,7 +42,7 @@ function [data_epoched, epoch_indices] = pullStimEpochs(data, burst_limits, fsDa
         chanMax = chanMax(1);
 
         diffSig = dataDiff(:, chanMax);
-        pklocs = find(abs(zscore(diffSig)) > thresh);
+        pklocs = find(abs(zscore(diffSig)) > 10);
         diffPks = diff(pklocs);
 
         artStarts = [pklocs(1); pklocs(find(diffPks > 3) + 1)];
@@ -55,8 +56,8 @@ function [data_epoched, epoch_indices] = pullStimEpochs(data, burst_limits, fsDa
     
     %% Epoch data
     
-    data_epoched = zeros(round((pre + post)*fsData) + 1, size(data, 2), 60);
     epoch_indices = [dataStarts - round(pre*fsData), dataStarts + round(post*fsData)];
+    data_epoched = zeros(median(epoch_indices(:, 2) - epoch_indices(:, 1)) + 1, size(data, 2), 60);
     for trl = 1:length(burst_limits)
         if epoch_indices(trl, 1) < 1 || epoch_indices(trl, 2) > length(data)
             data_epoched(:, :, trl) = NaN;
