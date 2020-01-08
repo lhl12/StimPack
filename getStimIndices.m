@@ -1,5 +1,5 @@
 function [burst_limits, pulse_idx, trial_voltage] = getStimIndices(Sing)
-%EPOCHSTIMDATA Breaks ECoG data into epochs based on stimulation timing
+%EPOCHSTIMDATA pulls relevant stimulation information from TDT outputs
 
 %   INPUTS:
 %   Sing: an output of the TDT that indicates when the TDT sent the signal

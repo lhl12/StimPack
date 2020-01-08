@@ -27,13 +27,6 @@ function [stim_pulses, adj_by_all] = pullStimPulses(data, pulse_idx, fsData, fsS
 %       signal and stimulation artifact in the data for each trial, a
 %       trials x 1 array
 
-%   ASSUMPTIONS:
-%   -sample differences will be relatively consistent across trials
-%   -works best when there are multiple pulses in each trial (just use
-%    pullStimEpochs with a smaller window if there is one pulse per trial
-%    for efficiency and to avoid crashing)
-%   -stim pre/post isolates each pulse relatively well
-
     %% Parse inputs
     
     p = inputParser;
@@ -44,7 +37,7 @@ function [stim_pulses, adj_by_all] = pullStimPulses(data, pulse_idx, fsData, fsS
         ' size time x channels with more time points than channels']);
     addRequired(p, 'data', validData);
     
-    validLims = @(x) assert(isnumeric(x) && size(x, 2) == 1, ...
+    validLims = @(x) assert(iscell(x) && size(x, 2) == 1, ...
         'burst_limits must be a numeric array of size epochs x 1');
     addRequired(p, 'pulse_idx', validLims);
     
@@ -63,8 +56,9 @@ function [stim_pulses, adj_by_all] = pullStimPulses(data, pulse_idx, fsData, fsS
         'adjust must be equal to 0, 1, true, or false');
     addParameter(p, 'adjust', false, validAdj);
     
-    validAdjBy = @(x) assert((isnumeric && isequal(mod(x, 1), 0)) && ...
-        isequal(size(x), [1, 1]), 'adj_by must be one round numeric value');
+    validAdjBy = @(x) assert(isnan(x) || (isnumeric(x) && isequal(mod(x, 1), 0)) && ...
+        isequal(size(x), [1, 1]), ['adj_by must be one '...
+        'round numeric value or NaN']);
     addParameter(p,'adj_by', NaN, validAdjBy);
     
     % parse values
@@ -77,7 +71,7 @@ function [stim_pulses, adj_by_all] = pullStimPulses(data, pulse_idx, fsData, fsS
     pre = p.Results.pre;
     post = p.Results.post;
     adjust = logical(p.Results.adjust);
-    adj_by = p.Results.adjust;
+    adj_by = p.Results.adj_by;
     
     %% Pull the time immediately surrounding each individual pulse for each trial
     
@@ -91,7 +85,6 @@ function [stim_pulses, adj_by_all] = pullStimPulses(data, pulse_idx, fsData, fsS
     % noisy neural data
     for trl = 1:length(pulse_idx)
         
-        disp(trl)
         pid = pulse_idx{trl};
         [stim_pulses{trl}, ~, adj_by_all(trl)] = pullStimEpochs(data, pid, fsData, ...
             fsSing, pre, post, 'adjust', adjust, 'adj_by', adj_by);
