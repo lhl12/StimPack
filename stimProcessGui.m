@@ -23,7 +23,7 @@ function varargout = stimProcessGui(varargin)
 
 % Edit the above text to modify the response to help stimProcessGui
 
-% Last Modified by GUIDE v2.5 08-Jan-2020 10:27:09
+% Last Modified by GUIDE v2.5 09-Jan-2020 21:38:01
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -58,6 +58,9 @@ handles.output.pre_pulse = 0;
 handles.output.post_pulse = 0;
 handles.output.pre_burst = 0;
 handles.output.post_burst = 0;
+set(handles.save_bool, 'value', 1);
+handles.output.save_bool = true;
+handles.output.basename = 'output';
 
 % update drop down menu with variable names
 handles.vars = varargin{1};
@@ -199,6 +202,28 @@ handles.output.adj_samps = str2double(get(hObject, 'String'));
 guidata(hObject, handles);
 
 function adj_samps_CreateFcn(hObject, eventdata, handles)
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+%% SAVE SETTINGS
+function save_bool_Callback(hObject, eventdata, handles)
+handles.output.save_bool = get(hObject, 'Value');
+if handles.output.save_bool
+    set(handles.basename, 'Visible', 'on')
+    set(handles.basenameT, 'Visible', 'on')
+else
+    set(handles.basename, 'Visible', 'off')
+    set(handles.basenameT, 'Visible', 'off')
+end
+% Update handles structure
+guidata(hObject, handles);
+
+function basename_Callback(hObject, eventdata, handles)
+handles.output.basename = get(hObject, 'String');
+% Update handles structure
+guidata(hObject, handles);
+function basename_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
