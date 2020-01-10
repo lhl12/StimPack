@@ -10,6 +10,11 @@ a series of stimulation pulses delivered in sequence. These functions assume tha
 an output of all current (OpenEx, 01/2020) TDT protocols that involve stimulation. *Sing* is a record of when the TDT sends stimulation signals to the stim box, not of the stimulation output itself. For all tested protocols (DBS parameter sweep, sensory parameter sweep, sensory staircase, EP measure, EP screen, stim geometry), the stim impulses are recorded in channel one of Sing.data. *Will need to make alterations for functionality with paired pulse protocols.*
 
 
+# SCRIPTS
+### stimProcessAcrossSubjects: a wrapper for stimProcessAllFilesOneSubject
+#### TO U
+Fill in subjList, a cell array, with the names of the subjects desired and name one file within each directory named for each subject. Each folder should only have raw files for processing.
+
 # FUNCTIONS
 ### getStimIndices(): Pulls relevant stimulation information from TDT output *Sing*.
 #### REQUIRED INPUTS
@@ -50,7 +55,7 @@ an output of all current (OpenEx, 01/2020) TDT protocols that involve stimulatio
 * pre: the number of seconds to include in epoch prior to pulse start
 * post: the number of seconds to include in epoch after pulse start (this will include the rest of the burst window to account for potential differences in burst length
 #### OPTIONAL INPUTS:
-* adjust: a boolean determining if you would like to adjust for differences between TDT stimulation signal and stimulation artifact in the data (defaults to false)
+* adjust: a boolean determining if you would like to adju""st for differences between TDT stimulation signal and stimulation artifact in the data (defaults to false)
 * adj_by: a round double stating the number of samples you want to use toadjust for differences between TDT stimulation signal and stimulation artifact in the data, for instance if you would like this value to be the same across all runs. If adjust is set to true and no adj_by is specified, adj_by is calculated based on estimates of the stim artifact in the data
 #### OUTPUTS:
 * stim_pulses: the data surrounding each individual pulse, a trials x 1 cell array, with each cell containing a time x channels x pulses matrix
@@ -59,3 +64,41 @@ an output of all current (OpenEx, 01/2020) TDT protocols that involve stimulatio
 * this is not efficient code, but ensures that pulses are identified in the correct burst and in a way that should flexibly accomodate bursts with different numbers of stimulation pulses (only briefly tested the latter)
 * if only one pulse per burst, just use pullStimEpochs (the only difference is the output format of the data)
 
+### stimProcessAllFilesOneSubject(): processes all files in one folder
+#### OPTIONAL INPUTS:
+* path: the folder containing all of the files for a subject of interest
+* out_path: the folder to save results to
+* params: a parameter structure with the following fields: (the output of stimProcessGui)
+    * var: a string of the variable name that you would like to extract data from
+    * epochs: bool determining if you want to epoch the data
+    * pulses: bool determining if you want to pull individual pulses
+    * adj: bool determining if you would like to adjust the trial delimiters to match the artifact in the signal
+    * fix: bool determining if you would like to adjust all trials by the same amount
+    * adj_samps: if fixing the adjustment, by how many samples would you like to shift them all by
+    * pre_pulse: time, in seconds, to inlcude before each pulse
+    * post_pulse: time, in seconds, to include after each pulse
+    * pre_burst: time, in seconds, to include before each burst
+    * post_burst: time, in seconds, to include after each burst
+    * save_bool: bool determining if you would like to save processed results
+    * basename: base file name (will save as outdir/basename00.mat)
+##### if any inputs are unspecified, user input will be prompted
+#### OUTPUTS:
+* params (same as input, for if UI is used)
+
+### stimProcessGui(): a GUI to choose parameters for multi-subject or within-subject batch processing
+#### INPUTS:
+* var_choice: a cell array containing strings with the names of all variables in one subject's files
+#### OUTPUTS
+* params: a parameter structure with the following fields:
+    * var: a string of the variable name that you would like to extract data from (defaults to empty, which will crash the program)
+    * epochs: bool determining if you want to epoch the data, defaults to false
+    * pulses: bool determining if you want to pull individual pulses, defaults to false
+    * adj: bool determining if you would like to adjust the trial delimiters to match the artifact in the signal, defaults to false
+    * fix: bool determining if you would like to adjust all trials by the same amount, defaults to false
+    * adj_samps: if fixing the adjustment, by how many samples would you like to shift them all by, defaults to NaN
+    * pre_pulse: time, in seconds, to inlcude before each pulse, defaults to 1
+    * post_pulse: time, in seconds, to include after each pulse, defaults to 2
+    * pre_burst: time, in seconds, to include before each burst, defaults to .0045
+    * post_burst: time, in seconds, to include after each burst, defaults to .0045
+    * save_bool: bool determining if you would like to save processed results, defaults to true
+    * basename: base file name (will save as outdir/basename00.mat), defaults to 'output'
