@@ -23,6 +23,9 @@ function [params] = stimProcessAllFilesOneSubject(varargin)
 %       save_bool: bool determining if you would like to save processed
 %           results
 %       basename: base file name (will save as outdir/basename00.mat)
+
+%   OUTPUTS:
+%   params: so GUI does not need to be rerun for each subject in loop
     
     p = inputParser;
     addParameter(p,'path', [], @isfolder);
