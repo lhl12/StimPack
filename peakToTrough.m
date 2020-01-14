@@ -1,7 +1,8 @@
-function [outputArg1,outputArg2] = peakToTrough(dataFilt, tEpoch, tPkWin)
+function [p2t, allMins, allMinsLat, allMaxes, allMaxesLat] = ...
+    peakToTrough(dataFilt, tEpoch, fsData)
 
     % select the range for EPs from trial averages
-    win = peakToTroughWindowGui(dataFilt, tEpoch);
+    win = peakToTroughWindowGui(mean(dataFilt, 3), tEpoch);
     
     % find min and max from trial average
     twin = tEpoch >= win(1) & tEpoch <= win(2);
@@ -11,8 +12,8 @@ function [outputArg1,outputArg2] = peakToTrough(dataFilt, tEpoch, tPkWin)
     avgMins = zeros(chans, 2);
     avgMaxes = zeros(chans, 2);
     for ch = 1:chans
-        [locmin, mini] = findpeaks(-mean(sigWin(:, ch, :), 3), 'MinPeakProminence', 5e-6);
-        [locmax, maxi] = findpeaks(mean(sigWin(:, ch, :), 3), 'MinPeakProminence', 5e-6);
+        [locmin, mini] = findpeaks(-mean(sigWin(:, ch, :), 3), 'MinPeakProminence', 2.5e-6);
+        [locmax, maxi] = findpeaks(mean(sigWin(:, ch, :), 3), 'MinPeakProminence', 2.5e-6);
         
         locmin = -locmin;
         
@@ -29,8 +30,38 @@ function [outputArg1,outputArg2] = peakToTrough(dataFilt, tEpoch, tPkWin)
     minWin = [avgMins(:, 2) - locWinSamps avgMins(:, 2) + locWinSamps];
     maxWin = [avgMaxes(:, 2) - locWinSamps avgMaxes(:, 2) + locWinSamps];
     
-    % run through individual trials
-    f
+    % run through individual channels
+%     allMins = nan(size(sigWin, 3), size(sigWin, 2));
+%     allMaxes = nan(size(sigWin, 3), size(sigWin, 2));
+%     allMinsLat = nan(size(sigWin, 3), size(sigWin, 2));
+%     allMaxesLat = nan(size(sigWin, 3), size(sigWin, 2));
+%     for ch = 1:size(sigWin, 2)
+%         locWinMin = squeeze(sigWin(minWin(ch, 1):minWin(ch, 2), ch, :));
+%         locWinMax = squeeze(sigWin(maxWin(ch, 1):maxWin(ch, 2), ch, :));
+%         
+%         for trl = 1:size(locWinMin, 2)
+%             [allMins(trl, ch), allMinsLat(trl, ch)] = min(locWinMin(:, trl));
+%             [allMaxes(trl, ch), allMaxesLat(trl, ch)] = max(locWinMax(:, trl));
+%             
+% %             [m, l, ~, p] = findpeaks(-locWinMin(:, trl));
+% %             [~, i] = max(p);
+% %             if ~isempty(i)
+% %                 allMins(trl, ch) = -m(i);
+% %                 allMinsLat(trl, ch) = l(i);
+% %             end
+% %             
+% %             [m, l, ~, p] = findpeaks(locWinMax(:, trl));
+% %             [~, i] = max(p);
+% %             if ~isempty(i)
+% %                 allMaxes(trl, ch) = m(i);
+% %                 allMaxesLat(trl, ch) = l(i);
+% %             end
+%             
+%         end
+%         
+%     end
+%     
+%     p2t = allMaxes - allMins;
 
 end
 
