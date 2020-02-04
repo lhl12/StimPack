@@ -47,7 +47,7 @@ function [params] = stimProcessAllFilesOneSubject(varargin)
     files = dir([path '\*.mat']);
     
     % loop through all files
-    for filenum = 1%:length(files)
+    for filenum = 1:length(files)
         
         filename = files(filenum).name;
         % get file number

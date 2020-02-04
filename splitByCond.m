@@ -1,4 +1,4 @@
-function [splitData] = splitByCond(dataFilt, stimLevels)
+function [splitData, stims] = splitByCond(dataFilt, stimLevels)
 % SPLITDATA splits data by stimulation condition
 
 %   INPUTS:
@@ -10,12 +10,14 @@ function [splitData] = splitByCond(dataFilt, stimLevels)
 %   splitData: a 1 x conditions cell array with time x chans x trials
 %       arrays in each with the data for each condition type
 
-    stims = unique(vertcat(stimLevels{:, 2}));
-    stimBool = vertcat(stimLevels{:, 2}) == stims';
+%     stims = unique(vertcat(stimLevels{:, 2}));
+%     stimBool = vertcat(stimLevels{:, 2}) == stims';
+    stims = unique(stimLevels);
+    stimBool = stimLevels == stims';
     
-    splitData = cell(1, 4);
+    splitData = cell(1, length(stims));
     
-    for ii = 1:stim
+    for ii = 1:length(stims)
         splitData{ii} = dataFilt(:, :, stimBool(:, ii));
     end
 
